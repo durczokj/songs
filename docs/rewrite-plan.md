@@ -63,55 +63,55 @@ songs/
 
 ```mermaid
 flowchart LR
-    CLI[songs-cli<br/>commands + adapters + rendering] --> Core[songs-core<br/>domain + ports + sync algorithm]
+    CLI[songs-cli<br/>commands + rendering only] --> Core[songs-core<br/>domain + ports + algorithm + adapters]
 ```
 
 The dependency direction is one-way:
 
-- `songs-core` has no dependency on Picocli, Playwright, yt-dlp, Logback,
-  Homebrew, terminal output, or CLI classes.
-- `songs-cli` depends on `songs-core` and owns the current external adapters:
-  Apple Music, local files, YouTube, HTTP, environment checks, and CLI UX.
-- No app module is created yet. A future app can depend on `songs-core` and
-  add its own adapters without becoming a dependency of the core.
+- `songs-core` is a **fully functioning library**: it contains the domain, the
+  ports, the sync algorithm, and working implementations of those ports
+  (Apple Music, local files, YouTube, HTTP, environment checks). A consumer
+  can depend on `songs-core` alone and actually sync playlists.
+- `songs-core` has no dependency on Picocli, terminal output, exit codes,
+  Homebrew, or CLI classes.
+- `songs-cli` depends on `songs-core` and contains nothing but command
+  definitions, dependency wiring, rendering, and exit-code mapping.
+- A future app depends on `songs-core` the same way the CLI does, and reuses
+  the same adapters and use cases.
 
-Keeping adapters in `songs-cli` for now is deliberate: the first goal is to
-prove the core/serving boundary, not to create a third module prematurely.
-They can move to `songs-adapters` later without changing the core API.
+**The CLI is the thinnest possible layer.** If a class does real work — parses
+a playlist, downloads audio, writes tags, matches tracks — it belongs in
+`songs-core`, not in `songs-cli`.
 
 ### Core module contents
 
-Move these packages into `songs-core`:
-
 ```text
-com.songs.model       # Track, Playlist, plans, results
-com.songs.matching    # TrackMatcher, ExactTrackMatcher
-com.songs.sync        # PlaylistSynchronizer
-com.songs.repository  # PlaylistReader, PlaylistWriter ports only
-com.songs.provider    # AudioProvider port only
-com.songs.concurrency # shared fan-out utility
+com.songs.model              # Track, Playlist, plans, results
+com.songs.matching           # TrackMatcher, ExactTrackMatcher
+com.songs.sync               # PlaylistSynchronizer, SyncPlaylistUseCase
+com.songs.repository         # PlaylistReader/Writer ports + registry
+com.songs.repository.apple   # Apple Music adapter
+com.songs.repository.local   # local filesystem adapter + ID3 tags
+com.songs.provider           # AudioProvider port
+com.songs.provider.youtube   # yt-dlp adapter
+com.songs.http               # JDK HTTP adapter
+com.songs.env                # external-tool checks
+com.songs.concurrency        # shared fan-out utility
 ```
 
-The core owns decisions and structured results. It never prints or chooses a
-terminal format. `plan` remains pure; `apply` remains the effectful operation
-through the `PlaylistWriter` port.
+The core owns decisions, effects, and structured results. It never prints or
+chooses a terminal format. `plan` remains pure; `apply` remains the effectful
+operation through the `PlaylistWriter` port.
 
 ### CLI module contents
 
-Move the current serving and integration code into `songs-cli`:
-
 ```text
-com.songs.cli                 # SongsCommand and subcommands
-com.songs.cli.render           # terminal presentation
-com.songs.repository.apple    # Apple Music adapter
-com.songs.repository.local    # local filesystem adapter + tags
-com.songs.provider.youtube     # yt-dlp adapter
-com.songs.http                 # JDK HTTP adapter
-com.songs.env                  # external-tool checks
+com.songs.cli   # SongsCommand, SyncCommand, ShowCommand, DoctorCommand,
+                # RepositoryFactory (wiring), Renderer (presentation)
 ```
 
-The CLI constructs the adapters, selects repositories, invokes core
-operations, renders results, and maps outcomes to process exit codes.
+That is the entire module. The CLI selects which adapters to assemble, calls
+core use cases, renders results, and maps outcomes to process exit codes.
 
 ### Maven shape
 
@@ -128,13 +128,14 @@ The root POM becomes an aggregator:
 The module dependencies are:
 
 ```text
-songs-core  -> JDK + core runtime dependencies only
-songs-cli   -> songs-core + Picocli + adapters + runtime dependencies
+songs-core  -> Jackson, jaudiotagger, Playwright, SLF4J
+songs-cli   -> songs-core, Picocli, Logback
 ```
 
 The shaded executable is produced by `songs-cli`, not by `songs-core`.
-The core module should be testable with fakes and should not need yt-dlp,
-Playwright, ffmpeg, or a network connection.
+Core unit tests run against fakes and fixtures; the tests that genuinely need
+yt-dlp, ffmpeg, a browser, or the network are tagged `integration` and
+excluded from the default build.
 
 ### Shared use-case boundary
 
@@ -477,17 +478,22 @@ src/
 ## Project layout (current)
 
 ```text
-pom.xml                         # parent aggregator
-songs-core/
+pom.xml                           # parent aggregator
+songs-core/                       # the library: everything that does real work
   pom.xml
-  src/main/java/com/songs/      # domain, ports, matching, sync, concurrency
+  src/main/java/com/songs/
+    model/ matching/ sync/ concurrency/
+    repository/ repository/apple/ repository/local/
+    provider/ provider/youtube/
+    http/ env/
   src/test/java/com/songs/
-songs-cli/
+  src/test/resources/             # fixtures + test logging
+songs-cli/                        # thin serving layer
   pom.xml
-  src/main/java/com/songs/      # CLI, adapters, external integrations
-  src/main/resources/           # runtime logging
-  src/test/java/com/songs/
-  src/test/resources/           # adapter fixtures and test logging
+  src/main/java/com/songs/cli/    # commands, wiring, rendering
+  src/main/resources/             # runtime logging
+  src/test/java/com/songs/cli/
+  src/test/resources/
 ```
 
 ## Dependencies
@@ -747,12 +753,13 @@ Legend: `[x]` done · `[ ]` not started.
 
 ## Epic 5 — Core / CLI module split
 
-**Goal:** make the serving layer replaceable without touching the algorithm.
+**Goal:** a fully functioning library with the thinnest possible CLI on top.
 **Status: done.** Design: "Core / CLI split" above.
 
 - [x] Root POM is `packaging=pom` with `songs-core` and `songs-cli` modules.
-- [x] Model, matching, sync, ports, and concurrency moved into `songs-core`.
-- [x] CLI, adapters, HTTP, and env moved into `songs-cli`.
+- [x] Domain, matching, sync, ports, concurrency **and all adapters** live in
+      `songs-core`, so the library works standalone.
+- [x] `songs-cli` contains only commands, wiring, and rendering.
 - [x] `songs-core` tests run without network, browser, or subprocess dependencies.
 - [x] `songs-cli` tests use Picocli command execution and local fixtures.
 - [x] `SyncPlaylistUseCase` extracted; sync and dry-run share it.

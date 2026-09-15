@@ -22,3 +22,7 @@
 
 # Playwright/browser caches
 /ms-playwright/
+
+# Maven build output (all modules)
+target/
+dependency-reduced-pom.xml
