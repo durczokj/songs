@@ -12,7 +12,7 @@ while [ -L "$SCRIPT" ]; do
 done
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$SCRIPT")" && pwd)
-JAR="$SCRIPT_DIR/../target/songs.jar"
+JAR="$SCRIPT_DIR/../songs-cli/target/songs.jar"
 
 if [ ! -f "$JAR" ]; then
     printf '%s\n' "songs is not built yet. Run: mvn package" >&2

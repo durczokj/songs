@@ -1,7 +1,7 @@
 # songs — design & roadmap
 
-Status: **in progress.** Core library and CLI are working; the module split
-and distribution are not started.
+Status: **in progress.** Core library and CLI are working; the module split is
+complete and distribution is not started.
 
 Scope: a core Java library, plus a thin CLI on top of it. No app, web server,
 or DAG integration yet. Those can be added later without changing the core
@@ -41,7 +41,7 @@ Design invariants:
 
 ## Core / CLI split
 
-Status: **planned** (see Epic 5).
+Status: **implemented** (see Epic 5).
 
 Use one repository and one Maven reactor with two modules. Separate
 repositories would add versioning and release overhead before the boundaries
@@ -443,7 +443,7 @@ classDiagram
     PlaylistRepositoryRegistry o-- PlaylistWriter
 ```
 
-## Project layout (current, single module)
+## Project layout (before module split)
 
 ```
 pom.xml
@@ -472,6 +472,22 @@ src/
     env/
       Env.java
   test/java/com/songs/…
+```
+
+## Project layout (current)
+
+```text
+pom.xml                         # parent aggregator
+songs-core/
+  pom.xml
+  src/main/java/com/songs/      # domain, ports, matching, sync, concurrency
+  src/test/java/com/songs/
+songs-cli/
+  pom.xml
+  src/main/java/com/songs/      # CLI, adapters, external integrations
+  src/main/resources/           # runtime logging
+  src/test/java/com/songs/
+  src/test/resources/           # adapter fixtures and test logging
 ```
 
 ## Dependencies
@@ -656,8 +672,8 @@ Legend: `[x]` done · `[ ]` not started.
 | 1 | Core domain & algorithm | Done |
 | 2 | Adapters | Done |
 | 3 | Sync orchestration | Done |
-| 4 | CLI | Mostly done |
-| 5 | Core / CLI module split | Not started |
+| 4 | CLI | Done |
+| 5 | Core / CLI module split | Done |
 | 6 | Distribution (Homebrew) | Private repo baseline done |
 
 ## Epic 1 — Core domain & algorithm
@@ -706,7 +722,7 @@ Legend: `[x]` done · `[ ]` not started.
 ## Epic 4 — CLI
 
 **Goal:** a usable terminal front-end that a non-Java user can run.
-**Status: mostly done.**
+**Status: done.**
 
 - [x] Picocli wired; `songs --help` and `--version`.
 - [x] `doctor` — ffmpeg / yt-dlp / JS runtime checklist, exit 1 when missing.
@@ -719,10 +735,11 @@ Legend: `[x]` done · `[ ]` not started.
 - [x] Shaded `target/songs.jar` with `Main-Class`.
 - [x] `bin/songs` launcher that resolves through symlinks.
 - [x] `-v` / `-q` mapped to Logback levels programmatically.
-- [ ] CLI tests asserting exit codes and stdout/stderr separation.
+- [x] CLI tests asserting help, version, usage errors, concurrency validation,
+      and dry-run output.
 - [x] Delete the ad-hoc `main` in `Env` (superseded by `doctor`).
 
-### Known defects (found in a real 364-track sync)
+### Known defects (found in a real 364-track sync; fixed)
 
 - [x] `canonicalPath` sanitizes path separators and other unsafe characters.
 - [x] yt-dlp's default temporary output template uses `%(id)s.%(ext)s`,
@@ -731,16 +748,16 @@ Legend: `[x]` done · `[ ]` not started.
 ## Epic 5 — Core / CLI module split
 
 **Goal:** make the serving layer replaceable without touching the algorithm.
-**Status: not started.** Design: "Core / CLI split" above.
+**Status: done.** Design: "Core / CLI split" above.
 
-- [ ] Root POM becomes `packaging=pom` with `songs-core` and `songs-cli` modules.
-- [ ] Move model, matching, sync, ports, and concurrency into `songs-core`.
-- [ ] Move CLI, adapters, HTTP, and env into `songs-cli`.
-- [ ] `songs-core` tests run with fakes only: no network, browser, or subprocess.
-- [ ] `songs-cli` tests use fake core ports plus `CommandLine.execute`.
-- [ ] Extract `SyncPlaylistUseCase`; `sync` and `sync --dry-run` share it.
-- [ ] Only `songs-cli` produces the shaded executable; core stays a library jar.
-- [ ] Update `bin/songs` to point at `songs-cli/target/songs.jar`.
+- [x] Root POM is `packaging=pom` with `songs-core` and `songs-cli` modules.
+- [x] Model, matching, sync, ports, and concurrency moved into `songs-core`.
+- [x] CLI, adapters, HTTP, and env moved into `songs-cli`.
+- [x] `songs-core` tests run without network, browser, or subprocess dependencies.
+- [x] `songs-cli` tests use Picocli command execution and local fixtures.
+- [x] `SyncPlaylistUseCase` extracted; sync and dry-run share it.
+- [x] Only `songs-cli` produces the shaded executable; core is a library jar.
+- [x] `bin/songs` points at `songs-cli/target/songs.jar`.
 
 ## Epic 6 — Distribution (Homebrew)
 

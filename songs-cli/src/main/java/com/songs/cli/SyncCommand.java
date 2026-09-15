@@ -1,14 +1,12 @@
 package com.songs.cli;
 
 import com.songs.model.AddResult;
-import com.songs.model.Playlist;
 import com.songs.model.RemoveResult;
 import com.songs.model.SyncPlan;
 import com.songs.model.SyncResult;
-import com.songs.repository.PlaylistReader;
 import com.songs.repository.PlaylistRepositoryRegistry;
 import com.songs.repository.PlaylistWriter;
-import com.songs.sync.PlaylistSynchronizer;
+import com.songs.sync.SyncPlaylistUseCase;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -38,27 +36,28 @@ final class SyncCommand implements Callable<Integer> {
         }
         try {
             PlaylistRepositoryRegistry registry = RepositoryFactory.create(concurrency);
-            Playlist source = extract(registry.readerFor(sourceUri), sourceUri);
-            Playlist target = extract(registry.readerFor(targetUri), targetUri);
-            PlaylistSynchronizer synchronizer = new PlaylistSynchronizer();
-            SyncPlan plan = synchronizer.plan(source, target);
+            SyncPlaylistUseCase useCase = new SyncPlaylistUseCase(new com.songs.sync.PlaylistSynchronizer());
             PrintWriter out = new PrintWriter(System.out, true);
             if (dryRun) {
+                SyncPlan plan = useCase.preview(
+                    registry.readerFor(sourceUri), sourceUri,
+                    registry.readerFor(targetUri), targetUri
+                );
                 Renderer.plan(plan, out);
                 return 0;
             }
             PlaylistWriter writer = registry.writerFor(targetUri);
-            SyncResult result = synchronizer.apply(plan, writer);
+            SyncResult result = useCase.execute(
+                registry.readerFor(sourceUri), sourceUri,
+                registry.readerFor(targetUri), targetUri,
+                writer
+            );
             Renderer.result(result, out);
             return hasFailures(result) ? 3 : 0;
         } catch (Exception e) {
             System.err.println("songs sync: " + e.getMessage());
             return 1;
         }
-    }
-
-    private static Playlist extract(PlaylistReader reader, String uri) throws Exception {
-        return reader.extract(uri);
     }
 
     private static boolean hasFailures(SyncResult result) {
