@@ -1,0 +1,8 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "code-runner.fileDirectoryAsCwd": false,
+    "code-runner.executorMap": {
+        "java": "mvn -q test-compile dependency:build-classpath -Dmdep.outputFile=target/cp.txt -Dmdep.includeScope=test && java -cp \"target/test-classes:target/classes:$(cat target/cp.txt)\" Playground"
+    }
+}

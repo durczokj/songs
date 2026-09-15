@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -eu
+
+SCRIPT="$0"
+while [ -L "$SCRIPT" ]; do
+    TARGET=$(readlink "$SCRIPT")
+    case "$TARGET" in
+        /*) SCRIPT="$TARGET" ;;
+        *) SCRIPT="$(dirname -- "$SCRIPT")/$TARGET" ;;
+    esac
+done
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$SCRIPT")" && pwd)
+JAR="$SCRIPT_DIR/../target/songs.jar"
+
+if [ ! -f "$JAR" ]; then
+    printf '%s\n' "songs is not built yet. Run: mvn package" >&2
+    exit 1
+fi
+
+exec java -jar "$JAR" "$@"

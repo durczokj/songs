@@ -1,0 +1,24 @@
+# Copyrighted or user-owned audio and playlist data
+/data/
+/legacy/data/
+**/*.mp3
+**/*.m4a
+**/*.wav
+**/*.flac
+**/*.aac
+**/*.ogg
+**/*.opus
+
+# Build and IDE output
+/target/
+/.idea/
+*.iml
+.DS_Store
+
+# Local configuration and credentials
+.env
+.env.*
+*.local
+
+# Playwright/browser caches
+/ms-playwright/
