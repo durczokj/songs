@@ -48,14 +48,5 @@ public final class Env {
         }
     }
 
-    public static void main(String[] args) {
-        if (args.length != 2) {
-            System.err.println("Usage: <command> <versionFlag>, e.g. ffmpeg -version");
-            System.exit(1);
-        }
-        String command = args[0];
-        String versionFlag = args[1];
-        System.out.println(command + " available: " + isCommandAvailable(command, versionFlag));
-    }
 }
 

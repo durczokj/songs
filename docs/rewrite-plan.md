@@ -718,18 +718,15 @@ Legend: `[x]` done · `[ ]` not started.
 - [x] Runtime `logback.xml` sending logs to stderr, data to stdout.
 - [x] Shaded `target/songs.jar` with `Main-Class`.
 - [x] `bin/songs` launcher that resolves through symlinks.
-- [ ] `-v` / `-q` mapped to Logback levels programmatically.
+- [x] `-v` / `-q` mapped to Logback levels programmatically.
 - [ ] CLI tests asserting exit codes and stdout/stderr separation.
-- [ ] Delete the ad-hoc `main` in `Env` (superseded by `doctor`).
+- [x] Delete the ad-hoc `main` in `Env` (superseded by `doctor`).
 
 ### Known defects (found in a real 364-track sync)
 
-- [ ] `canonicalPath` builds a filename from `Track.toString()`; titles
-      containing `/` are treated as directory separators and the move fails.
-      Sanitize path separators and other unsafe characters.
-- [ ] yt-dlp's output template is `%(title)s.%(ext)s`, so concurrent
-      downloads with the same video title collide. Use a unique template
-      such as `%(id)s.%(ext)s`.
+- [x] `canonicalPath` sanitizes path separators and other unsafe characters.
+- [x] yt-dlp's default temporary output template uses `%(id)s.%(ext)s`,
+  preventing collisions between concurrent downloads with the same title.
 
 ## Epic 5 — Core / CLI module split
 

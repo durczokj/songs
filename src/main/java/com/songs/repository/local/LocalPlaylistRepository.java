@@ -158,7 +158,14 @@ public final class LocalPlaylistRepository implements PlaylistReader, PlaylistWr
     }
 
     private static Path canonicalPath(Path downloadedPath, Track track) {
-        return downloadedPath.resolveSibling(track + ".mp3");
+        String fileName = track.toString()
+            .replaceAll("[\\\\/:*?\"<>|\\p{Cntrl}]", "_")
+            .replaceAll("[ .]+$", "")
+            .trim();
+        if (fileName.isEmpty()) {
+            fileName = "untitled";
+        }
+        return downloadedPath.resolveSibling(fileName + ".mp3");
     }
 
     private RemoveResult removeOne(Track track, List<FileEntry> entries) {

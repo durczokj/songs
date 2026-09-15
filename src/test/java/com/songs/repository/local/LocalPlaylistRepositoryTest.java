@@ -128,6 +128,19 @@ class LocalPlaylistRepositoryTest {
     }
 
     @Test
+    void addTracksSanitizesUnsafeCharactersInCanonicalFilename(@TempDir Path tempDir) {
+        RecordingTagReader tagReader = new RecordingTagReader();
+        LocalPlaylistRepository repo = new LocalPlaylistRepository(new FakeAudioProvider(), tagReader);
+        Track track = track("Stereo Mix / 2022", "Artist");
+
+        List<AddResult> results = repo.addTracks(fileUri(tempDir), List.of(track));
+
+        AddResult.Added added = assertInstanceOf(AddResult.Added.class, results.get(0));
+        assertFalse(added.addedRef().contains("/Stereo Mix / 2022/"));
+        assertTrue(Path.of(added.addedRef()).getFileName().toString().contains("Stereo Mix _ 2022"));
+    }
+
+    @Test
     void addTracksMapsDownloadFailureToAddFailed(@TempDir Path tempDir) {
         FakeAudioProvider provider = new FakeAudioProvider();
         Track ok = track("Good", "Artist");

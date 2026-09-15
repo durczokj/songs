@@ -27,6 +27,11 @@ class YouTubeAudioProviderTest {
     }
 
     @Test
+    void defaultConfigUsesVideoIdForUniqueTemporaryPaths() {
+        assertEquals("%(id)s.%(ext)s", new YtDlpConfig().outputTemplate());
+    }
+
+    @Test
     void extractFirstWatchUrlFindsVideoIdInJsonResponse() throws IOException {
         String json = readFixture();
 
