@@ -658,7 +658,7 @@ Legend: `[x]` done · `[ ]` not started.
 | 3 | Sync orchestration | Done |
 | 4 | CLI | Mostly done |
 | 5 | Core / CLI module split | Not started |
-| 6 | Distribution (Homebrew) | Not started |
+| 6 | Distribution (Homebrew) | Private repo baseline done |
 
 ## Epic 1 — Core domain & algorithm
 
@@ -748,8 +748,13 @@ Legend: `[x]` done · `[ ]` not started.
 ## Epic 6 — Distribution (Homebrew)
 
 **Goal:** `brew install` then `songs`, with no Java knowledge required.
-**Status: not started.** Design: "Distribution" above.
+**Status: private repository baseline done; Homebrew not started.** Design:
+"Distribution" above.
 
+- [x] Initialize a private GitHub repository at `durczokj/songs`.
+- [x] Add `.gitignore` rules excluding audio, local playlist data, build
+  output, credentials, and browser caches.
+- [x] Verify the initial commit contains no audio files or `data/` paths.
 - [ ] Switch from `0.1.0-SNAPSHOT` to tagged release versions.
 - [ ] GitHub Actions builds the CLI jar and publishes it to a Release.
 - [ ] Publish the SHA-256 checksum alongside the jar.
