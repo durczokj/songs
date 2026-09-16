@@ -13,10 +13,12 @@ final class DoctorCommand implements Callable<Integer> {
         boolean ffmpeg = Env.isFfmpegAvailable();
         boolean js = Env.isJsRuntimeAvailable();
         boolean ytdlp = commandAvailable("yt-dlp");
+        boolean browser = Env.isPlaywrightBrowserAvailable();
         System.out.printf("ffmpeg: %s%n", available(ffmpeg));
         System.out.printf("yt-dlp: %s%n", available(ytdlp));
         System.out.printf("JavaScript runtime: %s%n", available(js));
-        return ffmpeg && ytdlp && js ? 0 : 1;
+        System.out.printf("Playwright Chromium: %s%n", available(browser));
+        return ffmpeg && ytdlp && js && browser ? 0 : 1;
     }
 
     private static boolean commandAvailable(String command) {

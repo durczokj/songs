@@ -9,7 +9,7 @@ import picocli.CommandLine.Option;
     description = "Synchronize music playlists.",
     mixinStandardHelpOptions = true,
     version = "songs 0.1.0",
-    subcommands = {SyncCommand.class, ShowCommand.class, DoctorCommand.class}
+    subcommands = {SyncCommand.class, ShowCommand.class, DoctorCommand.class, SetupBrowserCommand.class}
 )
 public final class SongsCommand implements Runnable {
 

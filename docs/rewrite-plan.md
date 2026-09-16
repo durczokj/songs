@@ -533,7 +533,8 @@ nowhere outside it.
 ```
 songs sync <SOURCE_URI> <TARGET_URI>   # make target match source
 songs show <URI>                       # print the tracks at a URI
-songs doctor                           # check ffmpeg / yt-dlp / JS runtime
+songs doctor                           # check external tools and Chromium
+songs setup-browser                    # install Playwright Chromium
 ```
 
 `sync` is the whole point of the tool. It extracts both sides through
@@ -545,7 +546,8 @@ is downloaded once.
 reading before syncing.
 
 `doctor` wraps the `Env` predicates and reports what's missing. It replaces
-the ad-hoc `main` currently sitting in `Env`.
+the ad-hoc `main` currently sitting in `Env`. `setup-browser` invokes the
+Playwright Java installer for Chromium.
 
 ### Flags
 
@@ -624,6 +626,9 @@ class Songs < Formula
   version "0.1.0"
 
   depends_on "openjdk@21"
+  depends_on "ffmpeg"
+  depends_on "yt-dlp"
+  depends_on "node"
 
   def install
     libexec.install "songs.jar"
@@ -636,11 +641,10 @@ class Songs < Formula
 end
 ```
 
-The first formula should install only Java as a required Homebrew dependency.
-`yt-dlp`, `ffmpeg`, the JavaScript runtime, and the Playwright browser need
-explicit validation and platform testing before being made automatic formula
-dependencies. `songs doctor` must report actionable install instructions for
-anything missing.
+The first formula should declare Java, ffmpeg, yt-dlp, and Node as Homebrew
+dependencies. The Playwright Chromium browser is installed by
+`songs setup-browser` after the formula installation. `songs doctor` reports
+all four tool checks plus the browser status.
 
 ### User experience
 
@@ -648,6 +652,7 @@ anything missing.
 brew tap OWNER/songs
 brew install songs
 songs doctor
+songs setup-browser
 songs sync --dry-run SOURCE_URI TARGET_URI
 songs sync SOURCE_URI TARGET_URI
 ```
@@ -732,6 +737,8 @@ Legend: `[x]` done · `[ ]` not started.
 
 - [x] Picocli wired; `songs --help` and `--version`.
 - [x] `doctor` — ffmpeg / yt-dlp / JS runtime checklist, exit 1 when missing.
+- [x] `doctor` — also checks Playwright Chromium.
+- [x] `setup-browser` — installs Playwright Chromium through the Java CLI.
 - [x] `RepositoryFactory` — builds the registry, replaces Playground hardcoding.
 - [x] `show <URI>` — dispatch, extraction, rendering.
 - [x] `sync --dry-run` — plan rendering, no side effects.
@@ -783,6 +790,7 @@ Legend: `[x]` done · `[ ]` not started.
 - [ ] Formula depends on `openjdk@21` and uses `bin.write_jar_script`.
 - [ ] Formula `test do` block asserts `songs --help`.
 - [ ] Verify `brew install` on Apple Silicon and Intel macOS.
-- [ ] Decide whether ffmpeg / yt-dlp / JS runtime / Playwright browser become
-      formula dependencies or stay `doctor`-reported prerequisites.
+- [x] Decide runtime prerequisites: Homebrew installs ffmpeg, yt-dlp, and
+  Node; `songs setup-browser` installs Playwright Chromium; `doctor`
+  checks all four.
 

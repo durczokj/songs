@@ -19,6 +19,12 @@ Check everything is installed:
 ./bin/songs doctor
 ```
 
+If Playwright Chromium is missing, install it with:
+
+```bash
+./bin/songs setup-browser
+```
+
 Optional: make `songs` available everywhere:
 
 ```bash
@@ -32,6 +38,7 @@ source ~/.zshrc
 
 ```bash
 songs show file:///Users/you/Music
+songs setup-browser
 songs sync --dry-run "https://music.apple.com/..." "file:///Users/you/Music"
 songs sync "https://music.apple.com/..." "file:///Users/you/Music"
 ```

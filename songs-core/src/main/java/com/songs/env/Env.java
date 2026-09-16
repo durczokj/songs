@@ -1,6 +1,9 @@
 package com.songs.env;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import com.microsoft.playwright.Playwright;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +20,18 @@ public final class Env {
     /** yt-dlp needs a JS runtime on PATH (deno or node) to extract current YouTube streams. */
     public static boolean isJsRuntimeAvailable() {
         return isCommandAvailable("deno", "--version") || isCommandAvailable("node", "--version");
+    }
+
+    public static boolean isPlaywrightBrowserAvailable() {
+        try (Playwright playwright = Playwright.create()) {
+            Path executable = Path.of(playwright.chromium().executablePath());
+            boolean available = Files.isExecutable(executable);
+            logger.debug("Playwright Chromium available at {}: {}", executable, available);
+            return available;
+        } catch (RuntimeException e) {
+            logger.debug("Playwright Chromium is unavailable: {}", e.getMessage());
+            return false;
+        }
     }
 
     public static void requireFfmpeg() {
