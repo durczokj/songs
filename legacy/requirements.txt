@@ -1,7 +1,0 @@
-pyfiglet
-requests
-beautifulsoup4
-yt-dlp
-tqdm
-logging
-playwright
