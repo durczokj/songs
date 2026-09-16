@@ -9,9 +9,9 @@ Install the CLI with Homebrew:
 ```bash
 brew tap durczokj/songs
 brew install songs
+brew install ffmpeg yt-dlp node
+songs setup-browser
 ```
-
-This installs Java, ffmpeg, yt-dlp, Node, and the Playwright Chromium browser.
 
 Check everything is installed:
 

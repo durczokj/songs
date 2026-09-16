@@ -787,11 +787,17 @@ Legend: `[x]` done · `[ ]` not started.
 - [x] GitHub Actions builds the CLI jar and publishes it to a Release.
 - [x] Publish the SHA-256 checksum alongside the jar.
 - [x] Create the public `durczokj/homebrew-songs` tap with `Formula/songs.rb`.
-- [x] Formula depends on `openjdk@21`, ffmpeg, yt-dlp, and Node; it uses
-  `bin.write_jar_script` and installs Chromium in `post_install`.
+- [x] Formula depends on `openjdk@21` only and uses `bin.write_jar_script`.
+      ffmpeg / yt-dlp / Node are caveat-documented prerequisites, **not**
+      formula dependencies: on Intel macOS (Homebrew Tier 3) declaring them
+      forces the whole ffmpeg chain to rebuild from source, which takes hours.
+- [x] Shade filter drops Playwright's Linux/Windows Node runtimes; the release
+      jar went from 197 MB to 79 MB.
 - [x] Formula `test do` block asserts `songs --help`; Ruby syntax validated.
-- [ ] Verify `brew install` on Apple Silicon and Intel macOS.
-- [x] Decide runtime prerequisites: Homebrew installs ffmpeg, yt-dlp, and
-  Node; `songs setup-browser` installs Playwright Chromium; `doctor`
-  checks all four.
+- [x] Verify `brew install` on Intel macOS: installs in ~3s, `songs doctor`
+      all-green, live Apple Music extraction and `sync --dry-run` work.
+- [ ] Verify `brew install` on Apple Silicon.
+- [x] Decide runtime prerequisites: Homebrew installs only Java; ffmpeg,
+  yt-dlp and Node are caveat-documented prerequisites; `songs setup-browser`
+  installs Playwright Chromium; `doctor` checks all four.
 
