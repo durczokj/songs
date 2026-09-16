@@ -783,9 +783,9 @@ Legend: `[x]` done · `[ ]` not started.
 - [x] Add `.gitignore` rules excluding audio, local playlist data, build
   output, credentials, and browser caches.
 - [x] Verify the initial commit contains no audio files or `data/` paths.
-- [ ] Switch from `0.1.0-SNAPSHOT` to tagged release versions.
-- [ ] GitHub Actions builds the CLI jar and publishes it to a Release.
-- [ ] Publish the SHA-256 checksum alongside the jar.
+- [x] Switch from `0.1.0-SNAPSHOT` to tagged release versions.
+- [x] GitHub Actions builds the CLI jar and publishes it to a Release.
+- [x] Publish the SHA-256 checksum alongside the jar.
 - [ ] Create the `homebrew-songs` tap with `Formula/songs.rb`.
 - [ ] Formula depends on `openjdk@21` and uses `bin.write_jar_script`.
 - [ ] Formula `test do` block asserts `songs --help`.
