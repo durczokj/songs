@@ -786,9 +786,10 @@ Legend: `[x]` done · `[ ]` not started.
 - [x] Switch from `0.1.0-SNAPSHOT` to tagged release versions.
 - [x] GitHub Actions builds the CLI jar and publishes it to a Release.
 - [x] Publish the SHA-256 checksum alongside the jar.
-- [ ] Create the `homebrew-songs` tap with `Formula/songs.rb`.
-- [ ] Formula depends on `openjdk@21` and uses `bin.write_jar_script`.
-- [ ] Formula `test do` block asserts `songs --help`.
+- [x] Create the public `durczokj/homebrew-songs` tap with `Formula/songs.rb`.
+- [x] Formula depends on `openjdk@21`, ffmpeg, yt-dlp, and Node; it uses
+  `bin.write_jar_script` and installs Chromium in `post_install`.
+- [x] Formula `test do` block asserts `songs --help`; Ruby syntax validated.
 - [ ] Verify `brew install` on Apple Silicon and Intel macOS.
 - [x] Decide runtime prerequisites: Homebrew installs ffmpeg, yt-dlp, and
   Node; `songs setup-browser` installs Playwright Chromium; `doctor`
