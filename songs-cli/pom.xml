@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.songs</groupId>
         <artifactId>songs-parent</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2</version>
     </parent>
     <artifactId>songs-cli</artifactId>
     <dependencies>
@@ -55,12 +55,10 @@
                                 </transformer>
                             </transformers>
                             <filters>
-                                <!-- macOS-only distribution: drop Playwright's Linux/Windows Node runtimes -->
+                                <!-- Linux + macOS distribution: drop only Windows Node runtime -->
                                 <filter>
                                     <artifact>com.microsoft.playwright:driver-bundle</artifact>
                                     <excludes>
-                                        <exclude>driver/linux/**</exclude>
-                                        <exclude>driver/linux-arm64/**</exclude>
                                         <exclude>driver/win32_x64/**</exclude>
                                     </excludes>
                                 </filter>
