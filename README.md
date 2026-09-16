@@ -4,7 +4,8 @@ A CLI that syncs a playlist (e.g. Apple Music) to a local folder, downloading mi
 
 ## Install
 
-Install the CLI with Homebrew:
+On a new Mac, install Homebrew first. Follow the instructions at
+[brew.sh](https://brew.sh), then run:
 
 ```bash
 brew tap durczokj/songs
@@ -13,13 +14,16 @@ brew install ffmpeg yt-dlp node
 songs setup-browser
 ```
 
+`brew install songs` installs Java 21. The other tools are installed
+separately because Homebrew may otherwise try to compile large dependency trees, especially on Intel Macs.
+
 Check everything is installed:
 
 ```bash
 songs doctor
 ```
 
-If the browser needs to be installed or repaired:
+If the browser needs to be installed or repaired later:
 
 ```bash
 songs setup-browser
