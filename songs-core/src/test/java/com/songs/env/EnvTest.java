@@ -1,5 +1,7 @@
 package com.songs.env;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -15,7 +17,23 @@ class EnvTest {
     Path temporaryDirectory;
 
     @Test
-    void playwrightBrowserCheckInspectsCacheWithoutStartingPlaywright() {
+    void playwrightBrowserCheckReturnsFalseForEmptyCache() {
+        assertFalse(Env.isPlaywrightBrowserAvailable(temporaryDirectory));
+    }
+
+    @Test
+    void playwrightBrowserCheckReturnsTrueWhenChromiumMarkerExists() throws IOException {
+        Path chromiumDir = Files.createDirectory(temporaryDirectory.resolve("chromium-1243"));
+        Files.createFile(chromiumDir.resolve("INSTALLATION_COMPLETE"));
+        assertTrue(Env.isPlaywrightBrowserAvailable(temporaryDirectory));
+    }
+
+    @Test
+    void playwrightBrowserCheckIgnoresUnrelatedBrowsers() throws IOException {
+        Path firefox = Files.createDirectory(temporaryDirectory.resolve("firefox-1543"));
+        Files.createFile(firefox.resolve("INSTALLATION_COMPLETE"));
+        Path headlessShell = Files.createDirectory(temporaryDirectory.resolve("chromium_headless_shell-1243"));
+        Files.createFile(headlessShell.resolve("INSTALLATION_COMPLETE"));
         assertFalse(Env.isPlaywrightBrowserAvailable(temporaryDirectory));
     }
 

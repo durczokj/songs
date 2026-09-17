@@ -1,18 +1,20 @@
 package com.songs.repository.apple;
 
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserType;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
-import com.microsoft.playwright.options.WaitUntilState;
-
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.options.WaitUntilState;
 
 /**
  * Captures Apple Music's web-player API bearer token by loading a playlist page in a
@@ -42,7 +44,10 @@ public class AppleMusicTokenProvider {
 
     private String capture(String playlistUri) {
         AtomicReference<String> token = new AtomicReference<>();
-        try (Playwright playwright = Playwright.create()) {
+        // Prevent Playwright 1.61+ from auto-downloading Firefox/WebKit; we only need Chromium.
+        Playwright.CreateOptions options = new Playwright.CreateOptions()
+            .setEnv(Map.of("PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD", "1"));
+        try (Playwright playwright = Playwright.create(options)) {
             Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
             Page page = browser.newPage();
             page.onRequest(request -> {

@@ -29,10 +29,13 @@ public final class Env {
     }
 
     static boolean isPlaywrightBrowserAvailable(Path browserCache) {
-        try (Stream<Path> paths = Files.walk(browserCache)) {
-            boolean available = paths.anyMatch(path -> Files.isRegularFile(path)
-                && Files.isExecutable(path)
-                && path.getFileName().toString().equals(chromiumExecutableName()));
+        // Playwright writes an INSTALLATION_COMPLETE marker into each browser directory
+        // once its install finishes; stable across Chromium/Chrome-for-Testing renames.
+        try (Stream<Path> entries = Files.list(browserCache)) {
+            boolean available = entries
+                .filter(Files::isDirectory)
+                .filter(dir -> dir.getFileName().toString().startsWith("chromium-"))
+                .anyMatch(dir -> Files.isRegularFile(dir.resolve("INSTALLATION_COMPLETE")));
             logger.debug("Playwright Chromium available in {}: {}", browserCache, available);
             return available;
         } catch (IOException e) {
@@ -56,14 +59,6 @@ public final class Env {
             return Path.of(localAppData == null ? System.getProperty("user.home") : localAppData, "ms-playwright");
         }
         return Path.of(System.getProperty("user.home"), ".cache", "ms-playwright");
-    }
-
-    private static String chromiumExecutableName() {
-        String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-        if (os.contains("win")) {
-            return "chrome.exe";
-        }
-        return os.contains("mac") ? "Chromium" : "chrome";
     }
 
     public static void requireFfmpeg() {

@@ -42,7 +42,7 @@ class SongsCommandTest {
         int exitCode = command.execute("--version");
 
         assertEquals(0, exitCode);
-        assertEquals("songs 0.1.3", output.toString().trim());
+        assertEquals("songs 0.1.5", output.toString().trim());
     }
 
     @Test
