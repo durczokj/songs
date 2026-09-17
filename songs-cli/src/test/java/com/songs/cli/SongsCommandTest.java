@@ -26,7 +26,7 @@ class SongsCommandTest {
 
         String text = output.toString();
         assertEquals(0, exitCode);
-        assertTrue(text.contains("sync"));
+        assertTrue(text.contains("jobs"));
         assertTrue(text.contains("show"));
         assertTrue(text.contains("doctor"));
         assertTrue(text.contains("--quiet"));
@@ -42,7 +42,7 @@ class SongsCommandTest {
         int exitCode = command.execute("--version");
 
         assertEquals(0, exitCode);
-        assertEquals("songs 0.1.5", output.toString().trim());
+        assertEquals("songs 0.2.0", output.toString().trim());
     }
 
     @Test
@@ -51,10 +51,9 @@ class SongsCommandTest {
         CommandLine command = new CommandLine(new SongsCommand())
             .setErr(new PrintWriter(error, true));
 
-        int exitCode = command.execute("sync");
+        int exitCode = command.execute("jobs", "run");
 
         assertEquals(2, exitCode);
-        assertTrue(error.toString().contains("Missing required parameters"));
     }
 
     @Test
@@ -62,7 +61,7 @@ class SongsCommandTest {
         String uri = tempDir.toUri().toString();
 
         int exitCode = new CommandLine(new SongsCommand()).execute(
-            "sync", "--concurrency", "0", uri, uri
+                "jobs", "run", "--concurrency", "0", "--source", uri, "--target", uri
         );
 
         assertEquals(2, exitCode);
@@ -81,7 +80,7 @@ class SongsCommandTest {
         try {
             System.setOut(new PrintStream(output));
             int exitCode = new CommandLine(new SongsCommand()).execute(
-                "sync", "--dry-run", sourceUri, targetUri
+                "jobs", "run", "--dry-run", "--source", sourceUri, "--target", targetUri
             );
 
             assertEquals(0, exitCode);

@@ -33,9 +33,13 @@ songs setup-browser
 
 ```bash
 songs show file:///Users/you/Music
-songs sync --dry-run "https://music.apple.com/..." "file:///Users/you/Music"
-songs sync "https://music.apple.com/..." "file:///Users/you/Music"
+songs jobs run --dry-run --source "https://music.apple.com/..." --target "file:///Users/you/Music"
+songs jobs run --source "https://music.apple.com/..." --target "file:///Users/you/Music"
+
+songs jobs create favourite "https://music.apple.com/..." "file:///Users/you/Music"
+songs jobs run favourite
 ```
 
-`sync` makes the target match the source: it downloads missing tracks and
-**deletes** extra ones. Always run `--dry-run` first.
+`jobs run` makes the target match the source: it downloads missing tracks and
+**deletes** extra ones. Saved jobs live in `~/.songs/config.json`; set
+`SONGS_CONFIG` to use another config file. Always run `--dry-run` first.
