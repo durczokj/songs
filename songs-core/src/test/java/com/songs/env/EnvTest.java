@@ -1,13 +1,23 @@
 package com.songs.env;
 
-import org.junit.jupiter.api.Test;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class EnvTest {
+
+    @TempDir
+    Path temporaryDirectory;
+
+    @Test
+    void playwrightBrowserCheckInspectsCacheWithoutStartingPlaywright() {
+        assertFalse(Env.isPlaywrightBrowserAvailable(temporaryDirectory));
+    }
 
     @Test
     void isCommandAvailableReturnsFalseForUnknownCommand() {

@@ -3,7 +3,9 @@ package com.songs.env;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import com.microsoft.playwright.Playwright;
+import java.util.Locale;
+import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,15 +25,45 @@ public final class Env {
     }
 
     public static boolean isPlaywrightBrowserAvailable() {
-        try (Playwright playwright = Playwright.create()) {
-            Path executable = Path.of(playwright.chromium().executablePath());
-            boolean available = Files.isExecutable(executable);
-            logger.debug("Playwright Chromium available at {}: {}", executable, available);
+        return isPlaywrightBrowserAvailable(playwrightBrowserCache());
+    }
+
+    static boolean isPlaywrightBrowserAvailable(Path browserCache) {
+        try (Stream<Path> paths = Files.walk(browserCache)) {
+            boolean available = paths.anyMatch(path -> Files.isRegularFile(path)
+                && Files.isExecutable(path)
+                && path.getFileName().toString().equals(chromiumExecutableName()));
+            logger.debug("Playwright Chromium available in {}: {}", browserCache, available);
             return available;
-        } catch (RuntimeException e) {
-            logger.debug("Playwright Chromium is unavailable: {}", e.getMessage());
+        } catch (IOException e) {
+            logger.debug("Playwright Chromium is unavailable in {}: {}", browserCache, e.getMessage());
             return false;
         }
+    }
+
+    private static Path playwrightBrowserCache() {
+        String configuredPath = System.getenv("PLAYWRIGHT_BROWSERS_PATH");
+        if (configuredPath != null && !configuredPath.isBlank()) {
+            return Path.of(configuredPath);
+        }
+
+        String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        if (os.contains("mac")) {
+            return Path.of(System.getProperty("user.home"), "Library", "Caches", "ms-playwright");
+        }
+        if (os.contains("win")) {
+            String localAppData = System.getenv("LOCALAPPDATA");
+            return Path.of(localAppData == null ? System.getProperty("user.home") : localAppData, "ms-playwright");
+        }
+        return Path.of(System.getProperty("user.home"), ".cache", "ms-playwright");
+    }
+
+    private static String chromiumExecutableName() {
+        String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        if (os.contains("win")) {
+            return "chrome.exe";
+        }
+        return os.contains("mac") ? "Chromium" : "chrome";
     }
 
     public static void requireFfmpeg() {
