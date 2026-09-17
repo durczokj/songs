@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.songs</groupId>
         <artifactId>songs-parent</artifactId>
-        <version>0.1.5</version>
+        <version>0.2.0</version>
     </parent>
     <artifactId>songs-core</artifactId>
     <dependencies>
