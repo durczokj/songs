@@ -55,7 +55,7 @@ class SongsCommandTest {
     }
 
     @Test
-    void versionPrintsApplicationVersion() {
+    void versionPrintsApplicationVersion() throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         CommandLine command = new CommandLine(new SongsCommand())
             .setOut(new PrintWriter(output, true));
@@ -63,7 +63,7 @@ class SongsCommandTest {
         int exitCode = command.execute("--version");
 
         assertEquals(0, exitCode);
-        assertEquals("songs 0.2.0", output.toString().trim());
+        assertEquals(new SongsVersionProvider().getVersion()[0], output.toString().trim());
     }
 
     @Test
