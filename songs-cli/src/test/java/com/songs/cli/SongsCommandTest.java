@@ -2,6 +2,8 @@ package com.songs.cli;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import picocli.CommandLine;
 
 import java.io.ByteArrayOutputStream;
@@ -31,6 +33,25 @@ class SongsCommandTest {
         assertTrue(text.contains("doctor"));
         assertTrue(text.contains("--quiet"));
         assertTrue(text.contains("--verbose"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "jobs", "jobs create", "jobs list", "jobs get", "jobs delete", "jobs run",
+        "show", "doctor", "setup-browser"
+    })
+    void everySubcommandSupportsHelp(String subcommand) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ByteArrayOutputStream error = new ByteArrayOutputStream();
+        String[] args = (subcommand + " --help").split(" ");
+        CommandLine command = new CommandLine(new SongsCommand())
+            .setOut(new PrintWriter(output, true))
+            .setErr(new PrintWriter(error, true));
+
+        int exitCode = command.execute(args);
+
+        assertEquals(0, exitCode, () -> "songs " + subcommand + " --help failed: " + error);
+        assertTrue(output.toString().contains("Usage:"));
     }
 
     @Test

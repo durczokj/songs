@@ -6,7 +6,7 @@ import picocli.CommandLine.Command;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-@Command(name = "doctor", description = "Check required external tools.")
+@Command(name = "doctor", description = "Check required external tools.", mixinStandardHelpOptions = true)
 final class DoctorCommand implements Callable<Integer> {
     @Override
     public Integer call() {

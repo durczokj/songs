@@ -1,10 +1,13 @@
 package com.songs.cli;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Spec;
 
 @Command(
     name = "jobs",
     description = "Define and run playlist synchronization jobs.",
+    mixinStandardHelpOptions = true,
     subcommands = {
         JobsCreateCommand.class,
         JobsListCommand.class,
@@ -14,8 +17,11 @@ import picocli.CommandLine.Command;
     }
 )
 final class JobsCommand implements Runnable {
+    @Spec
+    CommandSpec spec;
+
     @Override
     public void run() {
-        System.out.println("Use 'songs jobs --help' to see available commands.");
+        spec.commandLine().usage(System.out);
     }
 }

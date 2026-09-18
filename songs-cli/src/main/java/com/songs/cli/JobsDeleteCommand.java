@@ -6,7 +6,7 @@ import picocli.CommandLine.Parameters;
 
 import java.util.concurrent.Callable;
 
-@Command(name = "delete", description = "Delete a saved sync job.")
+@Command(name = "delete", description = "Delete a saved sync job.", mixinStandardHelpOptions = true)
 final class JobsDeleteCommand implements Callable<Integer> {
     @Parameters(index = "0", description = "Job name")
     String name;

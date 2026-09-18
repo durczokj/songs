@@ -7,7 +7,7 @@ import picocli.CommandLine.Parameters;
 
 import java.util.concurrent.Callable;
 
-@Command(name = "get", description = "Show a saved sync job.")
+@Command(name = "get", description = "Show a saved sync job.", mixinStandardHelpOptions = true)
 final class JobsGetCommand implements Callable<Integer> {
     @Parameters(index = "0", description = "Job name")
     String name;

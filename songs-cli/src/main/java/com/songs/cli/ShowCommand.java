@@ -6,7 +6,7 @@ import picocli.CommandLine.Parameters;
 
 import java.util.concurrent.Callable;
 
-@Command(name = "show", description = "Print a playlist's tracks.")
+@Command(name = "show", description = "Print a playlist's tracks.", mixinStandardHelpOptions = true)
 final class ShowCommand implements Callable<Integer> {
     @Parameters(index = "0", description = "Playlist URI")
     String uri;

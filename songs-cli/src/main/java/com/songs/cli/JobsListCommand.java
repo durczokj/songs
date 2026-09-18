@@ -5,7 +5,7 @@ import picocli.CommandLine.Command;
 
 import java.util.concurrent.Callable;
 
-@Command(name = "list", description = "List saved sync jobs.")
+@Command(name = "list", description = "List saved sync jobs.", mixinStandardHelpOptions = true)
 final class JobsListCommand implements Callable<Integer> {
     @Override
     public Integer call() {
