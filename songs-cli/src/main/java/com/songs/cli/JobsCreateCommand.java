@@ -10,7 +10,7 @@ import picocli.CommandLine.Parameters;
 
 import java.util.concurrent.Callable;
 
-@Command(name = "create", description = "Create or update a saved sync job.")
+@Command(name = "create", description = "Create or update a saved sync job.", mixinStandardHelpOptions = true)
 final class JobsCreateCommand implements Callable<Integer> {
     @Parameters(index = "0", description = "Job name")
     String name;

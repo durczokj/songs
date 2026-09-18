@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
-@Command(name = "setup-browser", description = "Install the Playwright Chromium browser.")
+@Command(name = "setup-browser", description = "Install the Playwright Chromium browser.", mixinStandardHelpOptions = true)
 final class SetupBrowserCommand implements Callable<Integer> {
     @Override
     public Integer call() {
