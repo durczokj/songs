@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.songs</groupId>
         <artifactId>songs-parent</artifactId>
-        <version>0.2.0</version>
+        <version>${revision}</version>
     </parent>
     <artifactId>songs-cli</artifactId>
     <dependencies>
@@ -39,6 +39,12 @@
     </dependencies>
     <build>
         <finalName>songs</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
