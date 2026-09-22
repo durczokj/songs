@@ -34,7 +34,7 @@ Design invariants:
 
 ## Language / build baseline
 
-- **Java 21** (LTS). Uses `record`, `sealed` interfaces, virtual threads.
+- **Java 25** (LTS). Uses `record`, `sealed` interfaces, virtual threads.
 - **Maven** — a small multi-module build with strong IDE support.
 - Package root remains `com.songs`; modules provide separation without forcing
   a package rename.
@@ -625,14 +625,14 @@ class Songs < Formula
   sha256 "RELEASE_SHA256"
   version "0.1.0"
 
-  depends_on "openjdk@21"
+  depends_on "openjdk@25"
   depends_on "ffmpeg"
   depends_on "yt-dlp"
   depends_on "node"
 
   def install
     libexec.install "songs.jar"
-    bin.write_jar_script libexec/"songs.jar", "songs", java_version: "21"
+    bin.write_jar_script libexec/"songs.jar", "songs", java_version: "25"
   end
 
   test do
@@ -692,7 +692,7 @@ Legend: `[x]` done · `[ ]` not started.
 **Goal:** immutable domain types, sealed results, and pure matching logic.
 **Status: done.**
 
-- [x] Toolchain: JDK 21 + Maven, `pom.xml` targeting Java 21.
+- [x] Toolchain: JDK 25 + Maven, `pom.xml` targeting Java 25.
 - [x] Dependencies + JUnit 5 wired; `mvn test` green.
 - [x] Domain records: `Track`, `Playlist`, `AudioRef` with defensive copies.
 - [x] Sealed `TrackResolution` with `Resolved` / `Failed`.

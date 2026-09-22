@@ -18,7 +18,7 @@ public final class SongsConfigFile {
     private static final ObjectMapper MAPPER = JsonMapper.builder()
         .enable(SerializationFeature.INDENT_OUTPUT)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .serializationInclusion(JsonInclude.Include.NON_NULL)
+        .defaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))
         .build();
     private final Path path;
 
