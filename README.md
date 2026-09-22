@@ -14,7 +14,7 @@ brew install ffmpeg yt-dlp node
 songs setup-browser
 ```
 
-`brew install songs` installs Java 21. The other tools are installed
+`brew install songs` installs Java 25. The other tools are installed
 separately because Homebrew may otherwise try to compile large dependency trees, especially on Intel Macs.
 
 Check everything is installed:

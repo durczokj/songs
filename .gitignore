@@ -27,6 +27,7 @@
 # Maven build output (all modules)
 target/
 dependency-reduced-pom.xml
+**/bin/
 
 # Notebooks (but keep directory structure)
 notebooks/**
