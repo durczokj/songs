@@ -26,5 +26,5 @@ jobs:
           java-version: '25'
           cache: maven
 
-      - name: Run tests
-        run: mvn --batch-mode --no-transfer-progress clean test
+      - name: Build, test, and check style
+        run: mvn --batch-mode --no-transfer-progress clean verify

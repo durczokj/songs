@@ -1,10 +1,7 @@
 package com.songs.cli;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import picocli.CommandLine;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,103 +9,111 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import picocli.CommandLine;
 
 class SongsCommandTest {
 
-    @Test
-    void helpListsCommandsAndGlobalFlags() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        CommandLine command = new CommandLine(new SongsCommand())
-            .setOut(new PrintWriter(output, true));
+  @Test
+  void helpListsCommandsAndGlobalFlags() {
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    CommandLine command = new CommandLine(new SongsCommand()).setOut(new PrintWriter(output, true));
 
-        int exitCode = command.execute("--help");
+    int exitCode = command.execute("--help");
 
-        String text = output.toString();
-        assertEquals(0, exitCode);
-        assertTrue(text.contains("jobs"));
-        assertTrue(text.contains("show"));
-        assertTrue(text.contains("doctor"));
-        assertTrue(text.contains("--quiet"));
-        assertTrue(text.contains("--verbose"));
-    }
+    String text = output.toString();
+    assertEquals(0, exitCode);
+    assertTrue(text.contains("jobs"));
+    assertTrue(text.contains("show"));
+    assertTrue(text.contains("doctor"));
+    assertTrue(text.contains("--quiet"));
+    assertTrue(text.contains("--verbose"));
+  }
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-        "jobs", "jobs create", "jobs list", "jobs get", "jobs delete", "jobs run",
-        "show", "doctor", "setup-browser"
-    })
-    void everySubcommandSupportsHelp(String subcommand) {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        ByteArrayOutputStream error = new ByteArrayOutputStream();
-        String[] args = (subcommand + " --help").split(" ");
-        CommandLine command = new CommandLine(new SongsCommand())
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "jobs",
+        "jobs create",
+        "jobs list",
+        "jobs get",
+        "jobs delete",
+        "jobs run",
+        "show",
+        "doctor",
+        "setup-browser"
+      })
+  void everySubcommandSupportsHelp(String subcommand) {
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    ByteArrayOutputStream error = new ByteArrayOutputStream();
+    String[] args = (subcommand + " --help").split(" ");
+    CommandLine command =
+        new CommandLine(new SongsCommand())
             .setOut(new PrintWriter(output, true))
             .setErr(new PrintWriter(error, true));
 
-        int exitCode = command.execute(args);
+    int exitCode = command.execute(args);
 
-        assertEquals(0, exitCode, () -> "songs " + subcommand + " --help failed: " + error);
-        assertTrue(output.toString().contains("Usage:"));
+    assertEquals(0, exitCode, () -> "songs " + subcommand + " --help failed: " + error);
+    assertTrue(output.toString().contains("Usage:"));
+  }
+
+  @Test
+  void versionPrintsApplicationVersion() throws IOException {
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    CommandLine command = new CommandLine(new SongsCommand()).setOut(new PrintWriter(output, true));
+
+    int exitCode = command.execute("--version");
+
+    assertEquals(0, exitCode);
+    assertEquals(new SongsVersionProvider().getVersion()[0], output.toString().trim());
+  }
+
+  @Test
+  void missingArgumentsReturnUsageError() {
+    ByteArrayOutputStream error = new ByteArrayOutputStream();
+    CommandLine command = new CommandLine(new SongsCommand()).setErr(new PrintWriter(error, true));
+
+    int exitCode = command.execute("jobs", "run");
+
+    assertEquals(2, exitCode);
+  }
+
+  @Test
+  void invalidConcurrencyReturnsUsageError(@TempDir Path tempDir) {
+    String uri = tempDir.toUri().toString();
+
+    int exitCode =
+        new CommandLine(new SongsCommand())
+            .execute("jobs", "run", "--concurrency", "0", "--source", uri, "--target", uri);
+
+    assertEquals(2, exitCode);
+  }
+
+  @Test
+  void dryRunPrintsPlanWithoutChangingEmptyLocalTarget(@TempDir Path tempDir) throws IOException {
+    Path source = tempDir.resolve("source");
+    Path target = tempDir.resolve("target");
+    Files.createDirectories(source);
+    Files.createDirectories(target);
+    String sourceUri = source.toUri().toString();
+    String targetUri = target.toUri().toString();
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    PrintStream originalOut = System.out;
+    try {
+      System.setOut(new PrintStream(output));
+      int exitCode =
+          new CommandLine(new SongsCommand())
+              .execute("jobs", "run", "--dry-run", "--source", sourceUri, "--target", targetUri);
+
+      assertEquals(0, exitCode);
+      assertTrue(output.toString().contains("unchanged 0  add 0  remove 0"));
+      assertTrue(Files.isDirectory(target));
+    } finally {
+      System.setOut(originalOut);
     }
-
-    @Test
-    void versionPrintsApplicationVersion() throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        CommandLine command = new CommandLine(new SongsCommand())
-            .setOut(new PrintWriter(output, true));
-
-        int exitCode = command.execute("--version");
-
-        assertEquals(0, exitCode);
-        assertEquals(new SongsVersionProvider().getVersion()[0], output.toString().trim());
-    }
-
-    @Test
-    void missingArgumentsReturnUsageError() {
-        ByteArrayOutputStream error = new ByteArrayOutputStream();
-        CommandLine command = new CommandLine(new SongsCommand())
-            .setErr(new PrintWriter(error, true));
-
-        int exitCode = command.execute("jobs", "run");
-
-        assertEquals(2, exitCode);
-    }
-
-    @Test
-    void invalidConcurrencyReturnsUsageError(@TempDir Path tempDir) {
-        String uri = tempDir.toUri().toString();
-
-        int exitCode = new CommandLine(new SongsCommand()).execute(
-                "jobs", "run", "--concurrency", "0", "--source", uri, "--target", uri
-        );
-
-        assertEquals(2, exitCode);
-    }
-
-    @Test
-    void dryRunPrintsPlanWithoutChangingEmptyLocalTarget(@TempDir Path tempDir) throws IOException {
-        Path source = tempDir.resolve("source");
-        Path target = tempDir.resolve("target");
-        Files.createDirectories(source);
-        Files.createDirectories(target);
-        String sourceUri = source.toUri().toString();
-        String targetUri = target.toUri().toString();
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        try {
-            System.setOut(new PrintStream(output));
-            int exitCode = new CommandLine(new SongsCommand()).execute(
-                "jobs", "run", "--dry-run", "--source", sourceUri, "--target", targetUri
-            );
-
-            assertEquals(0, exitCode);
-            assertTrue(output.toString().contains("unchanged 0  add 0  remove 0"));
-            assertTrue(Files.isDirectory(target));
-        } finally {
-            System.setOut(originalOut);
-        }
-    }
+  }
 }

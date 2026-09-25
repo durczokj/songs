@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface JobStore {
-    void save(SyncJob job) throws IOException;
+  void save(SyncJob job) throws IOException;
 
-    Optional<SyncJob> load(String name) throws IOException;
+  Optional<SyncJob> load(String name) throws IOException;
 
-    boolean delete(String name) throws IOException;
+  boolean delete(String name) throws IOException;
 
-    List<SyncJob> list() throws IOException;
+  List<SyncJob> list() throws IOException;
 }

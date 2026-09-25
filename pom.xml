@@ -16,7 +16,7 @@
     </modules>
 
     <properties>
-        <revision>0.2.3</revision>
+        <revision>0.2.4</revision>
         <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -28,6 +28,8 @@
         <surefire.version>3.6.0</surefire.version>
         <playwright.version>1.63.0</playwright.version>
         <picocli.version>4.7.6</picocli.version>
+        <spotless.version>2.44.3</spotless.version>
+        <checkstyle.version>3.6.0</checkstyle.version>
         <!-- override with -DexcludedGroups= to include integration tests -->
         <excludedGroups>integration</excludedGroups>
     </properties>
@@ -42,6 +44,46 @@
                     <!-- run with -DexcludedGroups= to include network/browser tests -->
                     <excludedGroups>${excludedGroups}</excludedGroups>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.version}</version>
+                <configuration>
+                    <java>
+                        <googleJavaFormat>
+                            <version>1.28.0</version>
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-formatting</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${checkstyle.version}</version>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <failOnViolation>true</failOnViolation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkstyle</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
