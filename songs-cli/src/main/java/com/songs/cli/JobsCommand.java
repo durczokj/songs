@@ -9,19 +9,17 @@ import picocli.CommandLine.Spec;
     description = "Define and run playlist synchronization jobs.",
     mixinStandardHelpOptions = true,
     subcommands = {
-        JobsCreateCommand.class,
-        JobsListCommand.class,
-        JobsGetCommand.class,
-        JobsDeleteCommand.class,
-        JobsRunCommand.class
-    }
-)
+      JobsCreateCommand.class,
+      JobsListCommand.class,
+      JobsGetCommand.class,
+      JobsDeleteCommand.class,
+      JobsRunCommand.class
+    })
 final class JobsCommand implements Runnable {
-    @Spec
-    CommandSpec spec;
+  @Spec CommandSpec spec;
 
-    @Override
-    public void run() {
-        spec.commandLine().usage(System.out);
-    }
+  @Override
+  public void run() {
+    spec.commandLine().usage(System.out);
+  }
 }

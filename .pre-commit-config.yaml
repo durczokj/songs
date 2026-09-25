@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: java-quality
+        name: Java formatting and style checks
+        entry: mvn --batch-mode --no-transfer-progress spotless:check checkstyle:check
+        language: system
+        files: \.java$
+        pass_filenames: false
